@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { CylinderCarousel } from "@/components/ui/cylinder-carousel";
 import { MorphText } from "@/components/ui/morph-text";
-import { ChevronDown } from "lucide-react";
+import { ImageTrail } from "@/components/ui/image-trail";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal";
+import { TwistingRibbon } from "@/components/ui/twisting-ribbon";
+import { AuroraHero } from "@/components/ui/aurora-hero";
+import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
-// Curated local high-quality generated Seoul photos
+// Curated local high-quality generated Seoul photos for the 3D Carousel
 const SEOUL_IMAGES = [
   {
     src: "/seoul_tower.png",
@@ -49,7 +54,17 @@ const SEOUL_IMAGES = [
   }
 ];
 
+// Local high-quality generated images for the Image Trail
+const TRAIL_IMAGES = [
+  "/hangul_trail.png",
+  "/kpop_trail.png",
+  "/kdrama_trail.png",
+  "/boba_tea_trail.png",
+  "/hybe_ent_trail.png"
+];
+
 export default function App() {
+  const [currentPage, setCurrentPage] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
@@ -58,64 +73,192 @@ export default function App() {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    window.scrollTo(0, 0);
-
-    const handleScroll = () => {
-      setHasScrolled(true);
-      setScrolled(window.scrollY > 100);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handlePage1Scroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    setHasScrolled(true);
+    setScrolled(scrollTop > 100);
+  };
+
+  const goToPage2 = () => {
+    setCurrentPage(1);
+  };
+
+  const goToPage1 = () => {
+    setCurrentPage(0);
+  };
+
   return (
-    <div className="min-h-screen w-screen bg-[#06070b] text-neutral-100 flex flex-col font-sans relative overflow-x-hidden">
+    <div className="min-h-screen w-screen bg-[#06070b] text-neutral-100 font-sans relative overflow-hidden">
       
-      {/* ── Section 1: Full Screen 3D Carousel (Fixed in background) ── */}
-      <section className="fixed inset-0 h-screen w-full flex flex-col items-center justify-center z-10 overflow-hidden bg-[#06070b]">
-        {/* Decorative background grid and glowing circles */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+      {/* Horizontal Page Slider Container */}
+      <div 
+        className="flex w-[200vw] h-screen transition-transform duration-[850ms] cubic-bezier(0.85, 0, 0.15, 1)"
+        style={{ transform: `translateX(-${currentPage * 100}vw)` }}
+      >
         
-        {/* Centered Cylinder Carousel */}
-        <CylinderCarousel 
-          images={SEOUL_IMAGES} 
-          animationDuration={21}
-          cardWidth={577.89}
-          className="w-full select-none"
-          cardClassName="border border-white/10 hover:border-violet-500/50 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:scale-[1.03]"
-        />
-
-        {/* Bouncing Scroll Down Indicator (Fades out when scrolled) */}
+        {/* ── PAGE 1: Cylinder Carousel & Scroll MorphText ─────────────── */}
         <div 
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-neutral-500 select-none animate-bounce cursor-pointer z-30 pointer-events-auto transition-opacity duration-500 ${
-            scrolled ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
-          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+          onScroll={handlePage1Scroll}
+          className="h-screen w-screen overflow-y-auto relative scroll-smooth select-none"
         >
-          <span className="text-[10px] tracking-[0.3em] font-mono uppercase text-neutral-400">Scroll Down</span>
-          <ChevronDown className="w-5 h-5 text-violet-400" />
+          {/* Section 1: Sticky 3D Carousel (Fixed in view within Page 1) */}
+          <div className="sticky top-0 left-0 h-screen w-full flex flex-col items-center justify-center z-10 overflow-hidden bg-[#06070b]">
+            {/* Aurora Background Effect */}
+            <AuroraHero
+              title=""
+              className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-[0.25]"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+            
+            <CylinderCarousel 
+              images={SEOUL_IMAGES} 
+              animationDuration={21}
+              cardWidth={577.89}
+              className="w-full"
+              cardClassName="border border-white/10 hover:border-violet-500/50 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:scale-[1.03]"
+            />
+
+            <div 
+              className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-neutral-500 animate-bounce cursor-pointer z-30 transition-opacity duration-500 ${
+                scrolled ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+              onClick={(e) => {
+                e.currentTarget.parentElement?.parentElement?.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+              }}
+            >
+              <span className="text-[10px] tracking-[0.3em] font-mono uppercase text-neutral-400">Scroll Down</span>
+              <ChevronDown className="w-5 h-5 text-violet-400" />
+            </div>
+          </div>
+
+          {/* Section 2: Relative MorphText Overlay */}
+          <div className="relative h-screen w-full flex flex-col items-center justify-center bg-transparent z-20 overflow-hidden pointer-events-none mt-[100vh]">
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-rose-600/10 blur-[120px] pointer-events-none animate-pulse duration-[10000ms]" />
+            <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] rounded-full bg-violet-600/5 blur-[100px] pointer-events-none" />
+            
+            {hasScrolled && scrolled && (
+              <MorphText
+                words={["SEOUL", "DREAM", "INTUITION"]}
+                interval={2500}
+                subtext="Move fast. Break things."
+                fontSize="clamp(2rem, 10vw, 8rem)"
+                className="relative z-10"
+              />
+            )}
+          </div>
         </div>
-      </section>
 
-      {/* ── Section 2: Full Screen Morph Text (Scrolls transparently over Section 1) ── */}
-      <section className="relative min-h-screen w-full flex flex-col items-center justify-center bg-transparent z-20 mt-[100vh] overflow-hidden pointer-events-none">
-        {/* Glowing circle for the second fold */}
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-rose-600/10 blur-[120px] pointer-events-none animate-pulse duration-[10000ms]" />
-        <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] rounded-full bg-violet-600/5 blur-[100px] pointer-events-none" />
-        
-        {/* Curated Morph Text component (Centered, rendered only when scrolled down and user scrolled since load) */}
-        {hasScrolled && scrolled && (
-          <MorphText
-            words={["SEOUL", "DREAM", "INTUITION"]}
-            interval={2500}
-            subtext="Move fast. Break things."
-            fontSize="clamp(2rem, 10vw, 8rem)"
-            className="relative z-10"
-          />
-        )}
-      </section>
+        {/* ── PAGE 2: Split Layout with Image Trail & Metallic Button ── */}
+        <div className="h-screen w-screen overflow-y-auto relative bg-[#06070b] flex flex-col lg:flex-row items-center justify-center px-8 md:px-16 lg:px-24 py-16 gap-12 lg:gap-16">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-rose-600/5 blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/5 blur-[120px] pointer-events-none" />
+          
+          {/* Page 2 Background Twisting Ribbon */}
+          <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25] mix-blend-screen">
+            <TwistingRibbon
+              segments={400}
+              waveSpeed={0.018}
+              waveAmplitude={1}
+              twistCycles={6}
+              className="w-full h-full rounded-none"
+            />
+          </div>
+          
+          {/* Left Column: Typography */}
+          <motion.div 
+            initial={{ y: 150, opacity: 0 }}
+            animate={currentPage === 1 ? { y: 0, opacity: 1 } : { y: 150, opacity: 0 }}
+            transition={{ type: "tween", duration: 3, ease: "easeOut", delay: 0.3 }}
+            className="flex-1 flex flex-col justify-center text-left max-w-xl space-y-6 relative z-10"
+          >
+            <div className="space-y-2">
+              <span 
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-rose-500 font-mono text-xs uppercase tracking-[0.45em] font-semibold block"
+              >
+                Lets Explore
+              </span>
+              <h1 
+                style={{ fontFamily: "'Pinyon Script', cursive" }}
+                className="text-8xl md:text-[9.5rem] tracking-normal leading-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent drop-shadow-[0_4px_12px_rgba(255,255,255,0.05)] py-2 font-normal"
+              >
+                Seoul
+              </h1>
+            </div>
+            <p 
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              className="text-neutral-400 text-sm md:text-base leading-relaxed tracking-wide font-light max-w-lg"
+            >
+              Delve into the pulse of South Korea’s lifestyle. From the historic strokes of Hangul to the global wave of K-Pop, the emotional depth of K-Dramas, the sweetness of Boba, and the modern entertainment powerhouse HYBE. Hover over the showcase to reveal the trail.
+            </p>
+            {/* Liquid Metal Button */}
+            <div className="pt-4">
+              <LiquidMetalButton
+                icon={<ArrowRight className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />}
+                metalConfig={{
+                  colorBack: "#3b82f6",
+                  colorTint: "#93c5fd",
+                }}
+              >
+                Discover
+              </LiquidMetalButton>
+            </div>
+          </motion.div>
 
+          {/* Right Column: Showcase with Image Trail */}
+          <motion.div 
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={currentPage === 1 ? { scale: 1, opacity: 1 } : { scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.35 }}
+            className="flex-1 w-full max-w-xl flex flex-col items-center justify-center relative z-10"
+          >
+            <ImageTrail
+              images={TRAIL_IMAGES}
+              threshold={74}
+              minDelay={45}
+              duration={1100}
+              maxItems={9}
+              rotationRange={34}
+              imageClassName="w-32 rounded-md md:w-40"
+              className="w-full h-[500px] flex items-center justify-center bg-neutral-950/40 border border-neutral-900/60 rounded-3xl backdrop-blur-md shadow-2xl overflow-hidden cursor-crosshair group relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 to-transparent pointer-events-none" />
+              <h2 
+                style={{ fontFamily: "'Pinyon Script', cursive" }}
+                className="pointer-events-none text-6xl md:text-8xl tracking-normal bg-gradient-to-r from-violet-400 via-rose-400 to-amber-300 bg-clip-text text-transparent select-none py-2 font-normal"
+              >
+                Seoul Life
+              </h2>
+            </ImageTrail>
+          </motion.div>
+        </div>
+
+      </div>
+
+      {/* Navigation Buttons (Placed at root level, positioned in top corners to avoid 3D Cylinder Carousel overlap) */}
+      {currentPage === 0 && (
+        <button 
+          onClick={goToPage2}
+          className="fixed right-6 top-6 z-50 bg-violet-600/10 border border-violet-500/30 hover:bg-violet-600/20 hover:scale-105 px-5 py-2.5 rounded-full text-violet-400 cursor-pointer transition-all duration-300 shadow-[0_0_20px_rgba(109,40,217,0.15)] flex items-center gap-2 font-mono text-xs tracking-widest uppercase"
+        >
+          <span>Explore</span>
+          <ChevronRight className="w-4 h-4 text-violet-300" />
+        </button>
+      )}
+
+      {currentPage === 1 && (
+        <button 
+          onClick={goToPage1}
+          className="fixed left-6 top-6 z-50 bg-rose-600/10 border border-rose-500/30 hover:bg-rose-600/20 hover:scale-105 px-5 py-2.5 rounded-full text-rose-400 cursor-pointer transition-all duration-300 shadow-[0_0_20px_rgba(244,63,94,0.15)] flex items-center gap-2 font-mono text-xs tracking-widest uppercase"
+        >
+          <ChevronLeft className="w-4 h-4 text-rose-300" />
+          <span>Back</span>
+        </button>
+      )}
     </div>
   );
 }
